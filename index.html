@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>200 days of streak</title>
     <link rel="stylesheet" href="./style.css">
 </head>
@@ -45,53 +45,113 @@
             </div>
         </div>
     </div>
+
 <script>
   const surpriseBtn = document.getElementById('surpriseBtn');
   const balloonContainer = document.getElementById('balloonContainer');
 
-  // Simple short fanfare (base64-encoded small WAV-ish-ish placeholder sound)
-  const fanfare = new Audio(
-    "data:audio/wav;base64,UklGRhQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YVQAAAAA" +
-    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
-    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" 
-  );
-  // Optional pop to layer before fanfare
-  const pop = new Audio(
-    "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YRAAAA=="
-  );
+  // Better mobile audio handling
+  const createAudio = () => {
+    try {
+      return new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YRAAAA==");
+    } catch (e) {
+      return null;
+    }
+  };
 
-  // Touch feedback class toggle
-  surpriseBtn.addEventListener('touchstart', () => {
+  const fanfare = createAudio();
+  const pop = createAudio();
+
+  // Enhanced touch feedback with better mobile support
+  let touchStarted = false;
+
+  surpriseBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault(); // Prevent double-tap zoom
+    touchStarted = true;
     surpriseBtn.classList.add('touch-pressed');
+  }, { passive: false });
+
+  surpriseBtn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    surpriseBtn.classList.remove('touch-pressed');
+    if (touchStarted) {
+      handleSurpriseClick();
+    }
+    touchStarted = false;
+  }, { passive: false });
+
+  surpriseBtn.addEventListener('touchcancel', () => {
+    surpriseBtn.classList.remove('touch-pressed');
+    touchStarted = false;
   });
-  surpriseBtn.addEventListener('touchend', () => {
+
+  // Mouse events for desktop
+  surpriseBtn.addEventListener('mousedown', () => {
+    if (!touchStarted) {
+      surpriseBtn.classList.add('touch-pressed');
+    }
+  });
+
+  surpriseBtn.addEventListener('mouseup', () => {
     surpriseBtn.classList.remove('touch-pressed');
   });
 
-  surpriseBtn.addEventListener('click', function () {
-    // show celebration
-    balloonContainer.classList.add('show');
-    // force reflow to ensure animations trigger reliably on mobile
-    void balloonContainer.offsetWidth;
-
-    // hide button after a short delay so animation is visible
-    surpriseBtn.style.display = 'none';
-
-    // play layered sound: pop then fanfare
-    pop.currentTime = 0;
-    fanfare.currentTime = 0;
-    pop.play().catch(() => { /* ignore autoplay block if any */ });
-    setTimeout(() => {
-      fanfare.play().catch(() => { /* fallback */ });
-    }, 250);
+  surpriseBtn.addEventListener('mouseleave', () => {
+    surpriseBtn.classList.remove('touch-pressed');
   });
 
+  surpriseBtn.addEventListener('click', (e) => {
+    if (!touchStarted) {
+      handleSurpriseClick();
+    }
+  });
+
+  function handleSurpriseClick() {
+    // Force hardware acceleration trigger
+    balloonContainer.style.transform = 'translateZ(0)';
+    
+    // Show celebration with forced reflow
+    balloonContainer.classList.add('show');
+    
+    // Force browser to recalculate layout
+    balloonContainer.offsetHeight;
+    
+    // Hide button after animation starts
+    setTimeout(() => {
+      surpriseBtn.style.display = 'none';
+    }, 100);
+
+    // Play sounds with better mobile support
+    if (pop) {
+      pop.currentTime = 0;
+      pop.play().catch(() => {});
+    }
+    
+    setTimeout(() => {
+      if (fanfare) {
+        fanfare.currentTime = 0;
+        fanfare.play().catch(() => {});
+      }
+    }, 250);
+  }
+
   // Click anywhere to hide balloon and restore button
-  balloonContainer.addEventListener('click', function () {
+  balloonContainer.addEventListener('click', function(e) {
+    // Prevent immediate re-trigger
+    e.stopPropagation();
+    
     balloonContainer.classList.remove('show');
     setTimeout(() => {
       surpriseBtn.style.display = 'inline-block';
+      surpriseBtn.classList.remove('touch-pressed');
     }, 500);
+  });
+
+  // Prevent context menu on long press (mobile)
+  document.addEventListener('contextmenu', (e) => {
+    if (e.target === surpriseBtn) {
+      e.preventDefault();
+    }
   });
 </script>
 
