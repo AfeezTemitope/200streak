@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surprise Landing Page</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1 class="title">Something Special Awaits</h1>
+            <p class="subtitle">Click the button below for a surprise!</p>
+            <button class="surprise-btn" id="surpriseBtn">
+                <span class="btn-text">Click Me!</span>
+                <div class="btn-sparkles">
+                    <span class="sparkle"></span>
+                    <span class="sparkle"></span>
+                    <span class="sparkle"></span>
+                </div>
+            </button>
+        </div>
+
+        <!-- Balloon Container -->
+        <div class="balloon-container" id="balloonContainer">
+            <div class="balloon">
+                <div class="balloon-body"></div>
+                <div class="balloon-string"></div>
+                <div class="balloon-message">
+                    <h2>WELCOME TO</h2>
+                    <h1>200 STREAK</h1>
+                    <h2>BISOLA</h2>
+                    <div class="celebration-emojis">🎉✨🎈</div>
+                </div>
+            </div>
+            <div class="confetti">
+                <div class="confetti-piece"></div>
+                <div class="confetti-piece"></div>
+                <div class="confetti-piece"></div>
+                <div class="confetti-piece"></div>
+                <div class="confetti-piece"></div>
+                <div class="confetti-piece"></div>
+                <div class="confetti-piece"></div>
+                <div class="confetti-piece"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const surpriseBtn = document.getElementById('surpriseBtn');
+        const balloonContainer = document.getElementById('balloonContainer');
+
+        surpriseBtn.addEventListener('click', function() {
+            balloonContainer.classList.add('show');
+            surpriseBtn.style.display = 'none';
+            
+            // Add celebration sound effect (optional)
+            // You can add audio here if needed
+        });
+
+        // Click anywhere to hide balloon
+        balloonContainer.addEventListener('click', function() {
+            balloonContainer.classList.remove('show');
+            setTimeout(() => {
+                surpriseBtn.style.display = 'inline-block';
+            }, 500);
+        });
+    </script>
+</body>
+</html>
